@@ -229,9 +229,11 @@ void BankFasta::flush ()
 *********************************************************************/
 void BankFasta::insert (const Sequence& item)
 {
+    //cout<<"[Christina]\ttrying to insert item"<<endl;
     /** We open the last file if needed. */
     if (_insertHandle == 0  &&  _filenames.empty()==false)
     {
+        //cout<<"[Christina]\t openning file"<<_filenames[_filenames.size()-1]<<endl;
         _insertHandle = fopen (_filenames[_filenames.size()-1].c_str(), "w");
     }
 

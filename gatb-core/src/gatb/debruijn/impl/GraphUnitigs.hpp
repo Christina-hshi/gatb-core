@@ -84,7 +84,12 @@ struct NodeGU
     {
         strand = StrandReverse(strand);
     }
-
+    NodeGU& operator=(const NodeGU& other){
+        this->unitig = other.unitig;
+        this->strand = other.strand;
+        this->pos = other.pos;
+        return *this;
+    }
 };
 
 struct EdgeGU 
@@ -118,6 +123,15 @@ struct EdgeGU
         to.set   (unitig_to,   pos_to,   strand_to);
         direction = dir;
     }
+
+    //start by Christina
+    EdgeGU& operator = (const EdgeGU& other){
+        this->from = other.from;
+        this->to = other.to;
+        this->direction = other.direction;
+        return *this;
+    }
+    //end by Christina
 };
 
 /********************************************************************************
@@ -178,6 +192,12 @@ public:
      */
     static GraphUnitigsTemplate  load (const std::string& uri)  {  return  GraphUnitigsTemplate (uri);  }
     
+    //By Christina
+    //** load a graph (possiblely be unitig graph) from some URI
+    static GraphUnitigsTemplate loadUnitig(const std::string& uri, tools::misc::IProperties* options) { 
+        return GraphUnitigsTemplate(uri, options); 
+    }
+
     // we don't provide an option parser. use Graph's one
     //static tools::misc::IOptionsParser* getOptionsParser (bool includeMandatory=true);
 
@@ -226,6 +246,9 @@ public:
     /* neighbors used to be templated.. not anymore, trying to avoid nested template specialization; 
      * so call neighbors for getting nodes, or neighborsEdge for getting edges */
     inline GraphVector<EdgeGU> neighborsEdge    ( NodeGU& node, Direction dir=DIR_END) const  {   return getEdges(node, dir);           }
+    //start by Christina
+    GraphVector<EdgeGU> neighborsEdge_ordered (NodeGU& node, Direction dir=DIR_END);
+    //end by Christina
     inline EdgeGU* neighborsDummyEdge      ( NodeGU& node, Direction dir=DIR_END) const  {   return NULL;           }
 
     /** Shortcut for 'neighbors' method
@@ -369,6 +392,11 @@ public:
 
     /** Constructor. Use for reading from filesystem. */
     GraphUnitigsTemplate (const std::string& uri);
+
+    /*By Christina
+    * load graph in fasta format
+    */
+    GraphUnitigsTemplate (const std::string& uri, tools::misc::IProperties* options);
 
 public: // was private: before, but had many compilation errors during the change from Graph to GraphTemplate. took the easy route, set it to "public:", it solved everything.
    
