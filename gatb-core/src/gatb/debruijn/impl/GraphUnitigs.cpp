@@ -192,7 +192,22 @@ GraphUnitigsTemplate<span>::GraphUnitigsTemplate (size_t kmerSize)
 template<size_t span>
 GraphUnitigsTemplate<span>::GraphUnitigsTemplate (const std::string& uri)
 {
+    //load_unitigs(uri);
     std::cout << "unitigs graph constructor(uri) not supported" << std::endl; exit(1);
+}
+
+/*By Christina
+* load graph in fasta format
+*/
+template<size_t span>
+GraphUnitigsTemplate<span>::GraphUnitigsTemplate (const std::string& uri, tools::misc::IProperties* params)
+{
+    
+    BaseGraph::_kmerSize = params->getInt (STR_KMER_SIZE);
+    /** We configure the data variant according to the provided kmer size. */
+    BaseGraph::setVariant (BaseGraph::_variant, BaseGraph::_kmerSize);
+    load_unitigs(uri);
+    //std::cout << "unitigs graph constructor(uri) not supported" << std::endl; exit(1);
 }
 
 /*********************************************************************
@@ -347,7 +362,8 @@ parse_unitig_header(string header, float& mean_abundance, vector<uint64_t>& inc,
         }
         else
         {
-            if (field == "km")
+            if (field == "km") //should be upper cases  "KM" based on the description in github
+            //if(field == "KM")
             {
                 mean_abundance = atof(tok.substr(tok.find_last_of(':')+1).c_str());
                 //std::cout << "unitig " << header << " mean abundance " << mean_abundance << std::endl;
@@ -1097,6 +1113,33 @@ void GraphUnitigsTemplate<span>::remove ()
      * [node] is 1-in and 1-out yet compactions were fine, it's just that there is in-branching in the following node.
      */
 
+//start by Christina
+template<size_t span>
+GraphVector<EdgeGU> GraphUnitigsTemplate<span>::neighborsEdge_ordered (NodeGU& node, Direction dir){
+    GraphVector<EdgeGU> neighbors = getEdges(node, dir);
+    if(neighbors.size() <= 1){
+        return neighbors;
+    }
+    //sort the neighbors
+    std::map<uint64_t, int> order4neighbors;
+    for(size_t idx = 0; idx < neighbors.size(); idx++){
+        uint64_t first_unitig = neighbors[idx].to.unitig;
+        uint64_t last_unitig = (this->simplePathLastNode(neighbors[idx].to, dir)).unitig;
+        order4neighbors.insert(pair<uint64_t, int>(min(first_unitig, last_unitig), idx));
+    }
+    GraphVector<EdgeGU> neighbors_sorted;
+    neighbors_sorted.resize(neighbors.size());
+    size_t idx_tmp_=0;
+    for(auto ele : order4neighbors){
+        neighbors_sorted[idx_tmp_++] = neighbors[ele.second];
+        // neighbors_sorted[idx_tmp_++].set(neighbors[ele.second].from.unitig, neighbors[ele.second].from.pos, neighbors[ele.second].from.strand,
+        //                                  neighbors[ele.second].to.unitig, neighbors[ele.second].to.pos, neighbors[ele.second].to.strand, 
+        //                                  neighbors[ele.second].direction);
+    }
+    return neighbors_sorted;
+}
+//end by Christina
+
 template<size_t span>
 GraphVector<EdgeGU> GraphUnitigsTemplate<span>::getEdges (const NodeGU& source, Direction direction)  const
 {
@@ -1435,8 +1478,7 @@ std::string GraphUnitigsTemplate<span>::toString (const NodeGU& node) const
 
     if (node.strand != kmer::STRAND_FORWARD)
         node_str = revcomp(node_str);
-
-    return node_str;
+    return "#id:"+std::to_string(node.unitig)+" "+node_str;
 }
 
 // high-level functions that used to be in Simplifications.cpp
@@ -1799,6 +1841,9 @@ simplePathBothDirections(const NodeGU& node, bool& isolatedLeft, bool& isolatedR
 {
     string seq = internal_get_unitig_sequence(node.unitig);
     
+    //std::cout<<"\n[Christina]\tkmer-size: "<<BaseGraph::_kmerSize<<endl;
+    //cout<<"\n[Christina]\tcalling simplePathBothDirections...."<<endl;
+    //cout<<"[Christina]\t *start from seq: "<<seq<<endl;
     int kmerSize = BaseGraph::_kmerSize;
     float midTotalCoverage = unitigMeanAbundance(node) * (seq.size() - kmerSize + 1);
 
@@ -1814,6 +1859,7 @@ simplePathBothDirections(const NodeGU& node, bool& isolatedLeft, bool& isolatedR
     int endDegreeLeft, endDegreeRight;
     float rightTotalCoverage = 0, leftTotalCoverage = 0;
     int lenSeqRight = 0, lenSeqLeft = 0;
+    //cout<<"[Christina]\t *get sequences on the left and on the right"<<endl;
     simplePathLongest_avance (right, DIR_OUTCOMING, lenSeqRight, endDegreeRight, markDuringTraversal, rightTotalCoverage, &seqRight);
     simplePathLongest_avance (left, DIR_INCOMING, lenSeqLeft, endDegreeLeft, markDuringTraversal, leftTotalCoverage, &seqLeft);
 
