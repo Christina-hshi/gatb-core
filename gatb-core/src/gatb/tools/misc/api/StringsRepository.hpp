@@ -98,6 +98,7 @@ public:
     const char* histogram_max  ()  { return "-histo-max";      }
     const char* uri_debloom    ()  { return "-debloom";        }
     const char* uri_input      ()  { return "-in";             }
+    //const char* uri_unitig_input() { return "-unitig"; }//By Christina
     const char* uri_output     ()  { return "-out";            }
     const char* uri_output_dir ()  { return "-out-dir";        }
     const char* uri_output_tmp ()  { return "-out-tmp";        }
@@ -154,6 +155,7 @@ public:
 #define STR_HISTOGRAM_MAX       gatb::core::tools::misc::StringRepository::singleton().histogram_max ()
 #define STR_URI_DEBLOOM         gatb::core::tools::misc::StringRepository::singleton().uri_debloom ()
 #define STR_URI_INPUT           gatb::core::tools::misc::StringRepository::singleton().uri_input ()
+//#define STR_URI_UNITIG_INPUT    gatb::core::tools::misc::StringRepository::singleton().uri_unitig_input() //By Christina
 #define STR_URI_OUTPUT          gatb::core::tools::misc::StringRepository::singleton().uri_output ()
 #define STR_URI_OUTPUT_DIR      gatb::core::tools::misc::StringRepository::singleton().uri_output_dir ()
 #define STR_URI_OUTPUT_TMP      gatb::core::tools::misc::StringRepository::singleton().uri_output_tmp ()

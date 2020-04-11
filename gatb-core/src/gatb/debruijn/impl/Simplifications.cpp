@@ -566,7 +566,7 @@ unsigned long Simplifications<GraphType,Node,Edge>::removeTips()
                     _graph.simplePathDelete(simplePathStart, simplePathDir, nodesDeleter);
 
                     __sync_fetch_and_add(&nbTipsRemoved, 1);
-                    DEBUG_TIPS(cout << endl << "TIP FOUND, deleting node : " << _graph.toString(simplePathStart) << endl);
+                    DEBUG_TIPS(cout << endl << "TIP FOUND, deleting node " << _graph.toString(simplePathStart) << endl);
                 }
             } // end if isTip
 
@@ -1360,8 +1360,11 @@ unsigned long Simplifications<GraphType,Node,Edge>::removeBulges()
             TIME(auto start_various_overhead_t=get_wtime());
     
                 /** We follow the outgoing simple paths to get their length and last neighbor */
-                GraphVector<Edge> neighbors = _graph.neighborsEdge(node, dir);
-                
+                //GraphVector<Edge> neighbors = _graph.neighborsEdge(node, dir);
+                //start by Christina
+                GraphVector<Edge> neighbors = _graph.neighborsEdge_ordered(node, dir);
+                //end by Christina
+
                 DEBUG_BULGES(DebugBR debugBR(_graph.toString(node), neighbors.size()););
 
 

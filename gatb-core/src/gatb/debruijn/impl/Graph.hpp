@@ -639,6 +639,9 @@ public:
     /* neighbors used to be templated.. not anymore, trying to avoid nested template specialization; 
      * so call neighbors for getting nodes, or neighborsEdge for getting edges */
     inline GraphVector<Edge> neighborsEdge    ( Node& node, Direction dir=DIR_END) const  {   return getEdges(node, dir);           }
+    //start by Christina
+    GraphVector<Edge> neighborsEdge_ordered ( Node& node, Direction dir=DIR_END) {   return getEdges(node, dir);           }
+    //end by Christina
     inline Edge* neighborsDummyEdge      ( Node& node, Direction dir=DIR_END) const  {   return NULL;           }
     inline GraphVector<Edge> neighborsEdge    ( const typename Node::Value& kmer) const          {  return getEdgeValues (kmer);           }
 
